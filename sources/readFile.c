@@ -1,41 +1,5 @@
 #include "../headers/readFile.h"
 
-
-//=================================Utilities=================================================================
-
-void printAttributeList(AttributeList *attributeData) {
-    AttributeList *current = attributeData;
-
-    if (current == NULL) {
-        printf("No attributes found.\n");
-        return;
-    }
-
-    while (current != NULL) {
-        printf("ID: %d\n", current->data.id);
-        printf("Name: %s\n", current->data.name);
-        printf("Type: %s\n", current->data.type);
-        printf("Is Optional: %s\n", current->data.isOptional);
-        printf("Size: %d\n", current->data.size);
-        printf("--------------------------\n");
-
-        current = current->next;
-    }
-}
-
-void freeMemory(AttributeList *attributeData) {
-    AttributeList *current = attributeData;
-    while (current != NULL) {
-        AttributeList *next = current->next;
-        free(current);
-        current = next;
-    }
-}
-
-
-//===========================================================================================================
-
-//=================================load File Data============================================================
 int readTableFile(char nameTableFile[20], Table *tableData) {
 
     FILE *tableFile = fopen("./data/table.dic", "rb");
@@ -197,20 +161,23 @@ void loadData(char nameTableFile[20]) {
     Table *tableData = (Table *)malloc(sizeof(Table));
 
     if (!readTableFile(nameTableFile, tableData)) {
-        printf("No record found with the name %s\n", nameTableFile);
+        printf("No record found for '%s\n", nameTableFile);
         return;
     } 
 
-    // printf("phisical path archve: %s\n", tableData->phisical_name);
-
     AttributeList *attributeData = NULL;
     if (!readAttributeFile(&attributeData, tableData->id)) {
-        printf("No record found with the id %d\n", tableData->id);
+        printf("No attributes found for table '%s'.\n", nameTableFile);
         return;
     } 
 
     readDataFile(attributeData, tableData->phisical_name);
 
-    freeMemory(attributeData);
+    AttributeList *current = attributeData;
+    while (current != NULL) {
+        AttributeList *next = current->next;
+        free(current);
+        current = next;
+    }
 }
 //===========================================================================================================

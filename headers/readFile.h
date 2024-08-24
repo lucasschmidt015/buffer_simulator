@@ -28,9 +28,7 @@ struct AttributeList
     AttributeList *next;
 };
 
-void freeMemory(AttributeList *attributeData);
 void loadData(char nameTableFile[20]);
-void printAttributeList(AttributeList *attributeData);
 
 int readAttributeFile(AttributeList **attributeData, int tableId);
 int readDataFile(AttributeList *attributes, char phisicalName[20]);
