@@ -1,5 +1,41 @@
 #include "../headers/readFile.h"
 
+
+//=================================Utilities=================================================================
+
+void printAttributeList(AttributeList *attributeData) {
+    AttributeList *current = attributeData;
+
+    if (current == NULL) {
+        printf("No attributes found.\n");
+        return;
+    }
+
+    while (current != NULL) {
+        printf("ID: %d\n", current->data.id);
+        printf("Name: %s\n", current->data.name);
+        printf("Type: %s\n", current->data.type);
+        printf("Is Optional: %s\n", current->data.isOptional);
+        printf("Size: %d\n", current->data.size);
+        printf("--------------------------\n");
+
+        current = current->next;
+    }
+}
+
+void freeMemory(AttributeList *attributeData) {
+    AttributeList *current = attributeData;
+    while (current != NULL) {
+        AttributeList *next = current->next;
+        free(current);
+        current = next;
+    }
+}
+
+
+//===========================================================================================================
+
+//=================================load File Data============================================================
 int loadTableData(char nameTableFile[20], Table *tableData) {
 
     FILE *tableFile = fopen("./data/table.dic", "rb");
@@ -9,10 +45,9 @@ int loadTableData(char nameTableFile[20], Table *tableData) {
         return 0;
     }
 
-    //Determinate the number of records
-    fseek(tableFile, 0, SEEK_END); // Move to the end of the file 
-    long file_size = ftell(tableFile); // Get the file size
-    fseek(tableFile, 0, SEEK_SET); // Move back to the start of the file
+    fseek(tableFile, 0, SEEK_END); 
+    long file_size = ftell(tableFile); 
+    fseek(tableFile, 0, SEEK_SET); 
 
     int record_size = sizeof(Table);
     int num_records = file_size / record_size;
@@ -35,26 +70,6 @@ int loadTableData(char nameTableFile[20], Table *tableData) {
     fclose(tableFile);
 
     return hasBeenFound;
-}
-
-void printAttributeList(const AttributeList *attributeData) {
-    const AttributeList *current = attributeData;
-
-    if (current == NULL) {
-        printf("No attributes found.\n");
-        return;
-    }
-
-    while (current != NULL) {
-        printf("ID: %d\n", current->data.id);
-        printf("Name: %s\n", current->data.name);
-        printf("Type: %s\n", current->data.type);
-        printf("Is Optional: %s\n", current->data.isOptional);
-        printf("Size: %d\n", current->data.size);
-        printf("--------------------------\n");
-
-        current = current->next;
-    }
 }
 
 int loadAttributeData(AttributeList **attributeData, int tableId) {
@@ -130,10 +145,6 @@ void loadData(char nameTableFile[20]) {
 
     printAttributeList(attributeData);
 
-    AttributeList *current = attributeData;
-    while (current != NULL) {
-        AttributeList *next = current->next;
-        free(current);
-        current = next;
-    }
+    freeMemory(attributeData);
 }
+//===========================================================================================================
