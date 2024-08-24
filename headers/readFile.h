@@ -8,17 +8,19 @@ typedef struct
     int id;
     char logical_name[20];
     char phisical_name[20];
-} table;
+} Table;
 
 //This is struct is defining how the attributes dictionare should looks like
 typedef struct
 {
     int id;
     char name[20];
-    char type;
-    char isOptional;
+    char type[1];
+    char isOptional[1];
     int size;
-} att;
+} Attribute;
 
 void loadData(char nameTableFile[20]);
-int loadTableData(char nameTableFile[20], table *tableData);
+
+int loadAttributeData(Attribute *attributeData, int tableId);
+int loadTableData(char nameTableFile[20], Table *tableData);
