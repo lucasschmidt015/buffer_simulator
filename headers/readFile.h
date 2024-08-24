@@ -20,7 +20,16 @@ typedef struct
     int size;
 } Attribute;
 
-void loadData(char nameTableFile[20]);
 
-int loadAttributeData(Attribute *attributeData, int tableId);
+typedef struct AttributeList AttributeList;
+struct AttributeList
+{
+    Attribute data;
+    AttributeList *next;
+};
+
+void loadData(char nameTableFile[20]);
+void printAttributeList(const AttributeList *attributeData);
+
+int loadAttributeData(AttributeList **attributeData, int tableId);
 int loadTableData(char nameTableFile[20], Table *tableData);

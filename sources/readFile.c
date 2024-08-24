@@ -37,7 +37,27 @@ int loadTableData(char nameTableFile[20], Table *tableData) {
     return hasBeenFound;
 }
 
-int loadAttributeData(Attribute *attributeData, int tableId) {
+void printAttributeList(const AttributeList *attributeData) {
+    const AttributeList *current = attributeData;
+
+    if (current == NULL) {
+        printf("No attributes found.\n");
+        return;
+    }
+
+    while (current != NULL) {
+        printf("ID: %d\n", current->data.id);
+        printf("Name: %s\n", current->data.name);
+        printf("Type: %s\n", current->data.type);
+        printf("Is Optional: %s\n", current->data.isOptional);
+        printf("Size: %d\n", current->data.size);
+        printf("--------------------------\n");
+
+        current = current->next;
+    }
+}
+
+int loadAttributeData(AttributeList **attributeData, int tableId) {
     FILE *attributeFile = fopen("./data/att.dic", "rb");
 
     if (attributeFile == NULL) {
@@ -54,6 +74,7 @@ int loadAttributeData(Attribute *attributeData, int tableId) {
     int hasBeenFound = 0;
 
     Attribute loadedAttribute;
+    AttributeList *newNode = NULL;
 
     for (int i = 0; i < num_records; ++i) {
         if (fread(&loadedAttribute, record_size, 1, attributeFile) != 1) {
@@ -61,20 +82,23 @@ int loadAttributeData(Attribute *attributeData, int tableId) {
         }
 
         if (loadedAttribute.id == tableId) {
-            *attributeData = loadedAttribute;
-            hasBeenFound = 1;
-            break;
+            newNode = (AttributeList *)malloc(sizeof(AttributeList));
+            newNode->data = loadedAttribute;
+            newNode->next = NULL;
+
+            if (*attributeData == NULL) {
+                *attributeData = newNode;
+            } else {
+                AttributeList *current = *attributeData;
+                while (current->next != NULL) {
+                    current = current->next;
+                }
+                current->next = newNode;
+            }
+
+            hasBeenFound = 1; 
         }
     }
-
-    printf("\n");
-    printf("id: %d \n", loadedAttribute.id);
-    printf("isOptional: %s \n", loadedAttribute.isOptional);
-    printf("name: %s \n", loadedAttribute.name);
-    printf("size: %d \n", loadedAttribute.size);
-    printf("type: %s \n", loadedAttribute.type);
-    printf("\n");
-
 
     fclose(attributeFile);
 
@@ -97,14 +121,19 @@ void loadData(char nameTableFile[20]) {
 
     printf("phisical path archve: %s\n", tableData->phisical_name);
 
-    Attribute *attributeData = (Attribute *)malloc(sizeof(Attribute));
+    AttributeList *attributeData = NULL;
 
-    loadAttributeData(attributeData, tableData->id);
-
-    if (!loadAttributeData(attributeData, tableData->id)) {
+    if (!loadAttributeData(&attributeData, tableData->id)) {
         printf("No record found with the id %d\n", tableData->id);
         return;
     } 
 
-    printf("Attribute: %s\n", attributeData->name);
+    printAttributeList(attributeData);
+
+    AttributeList *current = attributeData;
+    while (current != NULL) {
+        AttributeList *next = current->next;
+        free(current);
+        current = next;
+    }
 }
