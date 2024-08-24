@@ -13,3 +13,5 @@ To run the compiled project, use the command below, replacing <TABLE_NAME> with 
 ```bash
 ./main <TABLE_NAME>
 ```
+## Git Repository: 
+[Buffer_simulator](https://github.com/lucasschmidt015/buffer_simulator)
