@@ -24,6 +24,8 @@ void loadData(char nameTableFile[20]) {
 
     table loadedTable;
 
+    int hasBeenFound = 0;
+
     for (int i = 0; i < num_records; ++i) {
         int result = fread(&loadedTable, record_size, 1, tableFile);
 
@@ -37,26 +39,29 @@ void loadData(char nameTableFile[20]) {
             break;
         }
 
-        // Output the data read from the file
-        printf("Record %d:\n", i + 1);
-        printf("ID: %d\n", loadedTable.id);
-        printf("Logical Name: %s\n", loadedTable.logical_name);
-        printf("Physical Name: %s\n", loadedTable.phisical_name);
-        printf("\n");
+        if (strcmp(loadedTable.logical_name, nameTableFile) == 0) {
+            // printf("Record %d:\n", i + 1);
+            // printf("ID: %d\n", loadedTable.id);
+            // printf("Logical Name: %s\n", loadedTable.logical_name);
+            // printf("Physical Name: %s\n", loadedTable.phisical_name);
+            // printf("\n");    
+            hasBeenFound = 1;
+            break;
+        }
+
+
+        // printf("Record %d:\n", i + 1);
+        // printf("ID: %d\n", loadedTable.id);
+        // printf("Logical Name: %s\n", loadedTable.logical_name);
+        // printf("Physical Name: %s\n", loadedTable.phisical_name);
+        // printf("\n");
     }
 
-    // table loadedTable;
-    // size_t result = fread(&loadedTable, sizeof(table), 1, tableFile);
+    if (!hasBeenFound) {
+        printf("We don't find a record with the name %s\n", nameTableFile);
+        return;
+    }
 
-    // if (result != 1) {
-    //     printf("Fail to read the file's data");
-    //     fclose(tableFile);
-    //     return;
-    // }
+    printf("Record has been founded.\n");
 
-    // fclose(tableFile);
-
-    // printf("ID: %d\n", loadedTable.id);
-    // printf("Logical Name: %s\n", loadedTable.logical_name);
-    // printf("Physical Name: %s\n", loadedTable.phisical_name);
 }

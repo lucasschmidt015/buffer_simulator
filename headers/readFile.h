@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 //This struct is difinig how the table dictionare should looks like
 typedef struct
