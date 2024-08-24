@@ -21,3 +21,4 @@ typedef struct
 } att;
 
 void loadData(char nameTableFile[20]);
+int loadTableData(char nameTableFile[20], table *tableData);

@@ -1,16 +1,12 @@
 #include "../headers/readFile.h"
 
-void loadData(char nameTableFile[20]) {
-    
-    if (!nameTableFile) {
-        return;
-    }
+int loadTableData(char nameTableFile[20], table *tableData) {
 
     FILE *tableFile = fopen("./data/table.dic", "rb");
 
     if (tableFile == NULL) {
         printf("Unable to open the table.dic\n");
-        return ;
+        return 0;
     }
 
     //Determinate the number of records
@@ -20,48 +16,41 @@ void loadData(char nameTableFile[20]) {
 
     int record_size = sizeof(table);
     int num_records = file_size / record_size;
-
+    int hasBeenFound = 0;
 
     table loadedTable;
 
-    int hasBeenFound = 0;
-
     for (int i = 0; i < num_records; ++i) {
-        int result = fread(&loadedTable, record_size, 1, tableFile);
-
-        if (result != 1) {
-            if (feof(tableFile)) {
-                printf("End of file reached\n");
-            } else {
-                printf("Error to read the file\n");
-            }
-
+        if (fread(&loadedTable, record_size, 1, tableFile) != 1) {
             break;
         }
 
         if (strcmp(loadedTable.logical_name, nameTableFile) == 0) {
-            // printf("Record %d:\n", i + 1);
-            // printf("ID: %d\n", loadedTable.id);
-            // printf("Logical Name: %s\n", loadedTable.logical_name);
-            // printf("Physical Name: %s\n", loadedTable.phisical_name);
-            // printf("\n");    
+            *tableData = loadedTable;
             hasBeenFound = 1;
             break;
         }
-
-
-        // printf("Record %d:\n", i + 1);
-        // printf("ID: %d\n", loadedTable.id);
-        // printf("Logical Name: %s\n", loadedTable.logical_name);
-        // printf("Physical Name: %s\n", loadedTable.phisical_name);
-        // printf("\n");
     }
 
-    if (!hasBeenFound) {
-        printf("We don't find a record with the name %s\n", nameTableFile);
+    fclose(tableFile);
+
+    return hasBeenFound;
+}
+
+void loadData(char nameTableFile[20]) {
+    
+    if (!nameTableFile) {
         return;
     }
 
-    printf("Record has been founded.\n");
+    table *tableData = (table *)malloc(sizeof(table));
+    loadTableData(nameTableFile, tableData);
 
+    if (loadTableData(nameTableFile, tableData)) {
+        printf("Coisa de louco tchê....\n");
+    } else {
+        printf("Mais bahh....\n");
+    }
+
+    
 }
