@@ -36,7 +36,7 @@ void freeMemory(AttributeList *attributeData) {
 //===========================================================================================================
 
 //=================================load File Data============================================================
-int loadTableData(char nameTableFile[20], Table *tableData) {
+int readTableFile(char nameTableFile[20], Table *tableData) {
 
     FILE *tableFile = fopen("./data/table.dic", "rb");
 
@@ -72,7 +72,7 @@ int loadTableData(char nameTableFile[20], Table *tableData) {
     return hasBeenFound;
 }
 
-int loadAttributeData(AttributeList **attributeData, int tableId) {
+int readAttributeFile(AttributeList **attributeData, int tableId) {
     FILE *attributeFile = fopen("./data/att.dic", "rb");
 
     if (attributeFile == NULL) {
@@ -120,6 +120,74 @@ int loadAttributeData(AttributeList **attributeData, int tableId) {
     return hasBeenFound;
 }
 
+int readDataFile(AttributeList *attributes, char phisicalName[20]) {
+    char filePath[50] = "./data/";
+    strcat(filePath, phisicalName);
+
+    FILE *dataFile = fopen(filePath, "rb");
+
+    if (dataFile == NULL) {
+        printf("Unable to open\n");
+        return 0;
+    }
+
+    AttributeList *currentAttribute;
+    int recordCount = 0;
+
+    while (1) {
+        currentAttribute = attributes;
+        int recordValid = 1;  
+
+        while (currentAttribute != NULL) {
+            Attribute attribute = currentAttribute->data;
+
+            if (attribute.type[0] == 'I') { 
+                int value;
+                if (fread(&value, sizeof(int), 1, dataFile) != 1) {
+                    recordValid = 0;
+                    break;
+                }
+                printf("%-20s: %d\n", attribute.name, value);
+            } else if (attribute.type[0] == 'D') { 
+                double value;
+                if (fread(&value, sizeof(double), 1, dataFile) != 1) {
+                    recordValid = 0;
+                    break;
+                }
+                printf("%-20s: %.6f\n", attribute.name, value);
+            } else if (attribute.type[0] == 'S') { 
+                char *value = (char *)malloc(attribute.size + 1);
+                if (fread(value, sizeof(char), attribute.size, dataFile) != attribute.size) {
+                    free(value);
+                    recordValid = 0;
+                    break;
+                }
+                value[attribute.size] = '\0'; 
+                printf("%-20s: %s\n", attribute.name, value);
+                free(value);
+            } else {
+                printf("Unknown type for attribute %s\n", attribute.name);
+                recordValid = 0;
+                break;
+            }
+
+            currentAttribute = currentAttribute->next;
+        }
+
+        if (!recordValid) {
+            break;  
+        }
+
+        printf("\n"); 
+        recordCount++;
+    }
+
+    fclose(dataFile);
+
+    printf("Total records read: %d\n", recordCount);
+    return 1;
+}
+
 void loadData(char nameTableFile[20]) {
     
     if (!nameTableFile) {
@@ -127,23 +195,21 @@ void loadData(char nameTableFile[20]) {
     }
 
     Table *tableData = (Table *)malloc(sizeof(Table));
-    loadTableData(nameTableFile, tableData);
 
-    if (!loadTableData(nameTableFile, tableData)) {
+    if (!readTableFile(nameTableFile, tableData)) {
         printf("No record found with the name %s\n", nameTableFile);
         return;
     } 
 
-    printf("phisical path archve: %s\n", tableData->phisical_name);
+    // printf("phisical path archve: %s\n", tableData->phisical_name);
 
     AttributeList *attributeData = NULL;
-
-    if (!loadAttributeData(&attributeData, tableData->id)) {
+    if (!readAttributeFile(&attributeData, tableData->id)) {
         printf("No record found with the id %d\n", tableData->id);
         return;
     } 
 
-    printAttributeList(attributeData);
+    readDataFile(attributeData, tableData->phisical_name);
 
     freeMemory(attributeData);
 }

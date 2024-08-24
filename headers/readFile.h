@@ -32,5 +32,6 @@ void freeMemory(AttributeList *attributeData);
 void loadData(char nameTableFile[20]);
 void printAttributeList(AttributeList *attributeData);
 
-int loadAttributeData(AttributeList **attributeData, int tableId);
-int loadTableData(char nameTableFile[20], Table *tableData);
+int readAttributeFile(AttributeList **attributeData, int tableId);
+int readDataFile(AttributeList *attributes, char phisicalName[20]);
+int readTableFile(char nameTableFile[20], Table *tableData);
